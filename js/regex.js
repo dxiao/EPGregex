@@ -62,6 +62,10 @@ $(function () {
     .focus();
 });
 
+function getMatchText(text) {
+  return text ? text : "nothing"
+}
+
 function exerciseFinished() {
   var regexGoal = $("#regex-curtest");
   regexGoal.children().slideUp();
@@ -82,7 +86,7 @@ function updateCurrentTests(animation) {
   } else {
     for (var i = curLength; i <= curTest; i++) {
       spec = createElement("p")
-        .text(testCases[i][0] + " should match to " + testCases[i][1]);
+        .text(testCases[i][0] + " should match " + getMatchText(testCases[i][1]));
 
       if (animation != "noanimation") {
         spec.hide().prependTo(regexGoal).slideDown();
@@ -142,11 +146,15 @@ function handleRegexEnter (e) {
   }
 }
 
+function prepRegexStr(regexstr) {
+  return regexstr.replace(/\(/g, "(?:")
+}
+
 function runRegex () {
   var regexstr = $("#regex-guess").val();
   if (regexstr.length == 0)
     return;
-  var regex = new RegExp(regexstr);
+  var regex = new RegExp(prepRegexStr(regexstr));
   var results = createElement("table").addClass("table");
   var tests = Math.min(testCases.length-1, curTest);
   var failing = 0,
@@ -213,7 +221,8 @@ function testRegex(regex, test, appendTo) {
       .append(createElement("td")
           .text(test[0]))
       .append(createElement("td")
-          .text("failed! expected " + test[1] + ", matched " + matched)));
+          .text("failed! expected " + getMatchText(test[1]) + 
+                ", matched " + getMatchText(matched))));
     return false;
   }
 }
